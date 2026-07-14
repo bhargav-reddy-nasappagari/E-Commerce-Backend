@@ -1,0 +1,50 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ecommerce-backend
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:ecommerce_db}
+    username: ${DB_USERNAME:ecommerce_user}
+    password: ${DB_PASSWORD:ecommerce_pass}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      # Use 'update' during active development, switch to 'validate' once schema stabilizes
+      ddl-auto: ${DDL_AUTO:update}
+    show-sql: ${SHOW_SQL:true}
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+# --- Custom application properties ---
+jwt:
+  secret: ${JWT_SECRET:change-this-to-a-long-random-base64-secret-in-your-env-file-minimum-256-bits}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000}   # 24 hours
+
+# --- springdoc / Swagger UI ---
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+
+# --- Logging ---
+logging:
+  level:
+    root: INFO
+    com.ecommerce.backend: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.springframework.security: INFO
