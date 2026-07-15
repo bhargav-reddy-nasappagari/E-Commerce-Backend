@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ecommerce-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-ecommerce_db}
+      POSTGRES_USER: ${DB_USERNAME:-ecommerce_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-ecommerce_pass}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-ecommerce_user} -d ${DB_NAME:-ecommerce_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # Uncomment once Dockerfile is ready (Phase 10) to run the app itself in a container.
+  # app:
+  #   build: .
+  #   container_name: ecommerce-backend
+  #   restart: unless-stopped
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   environment:
+  #     DB_HOST: postgres
+  #     DB_PORT: 5432
+  #     DB_NAME: ${DB_NAME:-ecommerce_db}
+  #     DB_USERNAME: ${DB_USERNAME:-ecommerce_user}
+  #     DB_PASSWORD: ${DB_PASSWORD:-ecommerce_pass}
+  #     JWT_SECRET: ${JWT_SECRET}
+  #     JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS:-86400000}
+  #   ports:
+  #     - "8080:8080"
+
+volumes:
+  postgres_data:
