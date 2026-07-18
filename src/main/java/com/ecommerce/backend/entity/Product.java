@@ -7,9 +7,15 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -30,7 +36,12 @@ import java.time.Instant;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(exclude = "category")
 @Entity
-@Table(name = "products")
+@Table(
+    name = "products",
+    indexes = {
+        @Index(name = "idx_products_category_id", columnList = "category_id")
+    }
+)
 @EntityListeners(AuditingEntityListener.class)
 public class Product {
 
@@ -39,16 +50,26 @@ public class Product {
     @EqualsAndHashCode.Include
     private Long id;
 
+    @NotBlank(message = "Product name is required")
+    @Size(max = 255)
     @Column(nullable = false)
     private String name;
 
     private String description;
 
-    @Column(nullable = false)
+    @NotNull
+    @DecimalMin(value = "0.01", message = "Price must be greater than zero")
+    @Column(
+        nullable = false,
+        precision = 12,
+        scale = 2
+    )
     private BigDecimal price;
 
+    @NotNull
+    @Min(value = 0, message = "Stock quantity cannot be negative")
     @Column(nullable = false)
-    private int stockQuantity;
+    private Integer stockQuantity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)

@@ -10,6 +10,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -36,7 +37,12 @@ import java.util.List;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(exclude = {"user", "items"})
 @Entity
-@Table(name = "orders")
+@Table(
+    name = "orders",
+    indexes = {
+        @Index(name = "idx_orders_user_id", columnList = "user_id")
+    }
+)
 @EntityListeners(AuditingEntityListener.class)
 public class Order {
 
@@ -60,10 +66,18 @@ public class Order {
     @Column(nullable = false)
     private OrderStatus status = OrderStatus.PENDING;
 
-    @Column(nullable = false)
+    @Column(
+        nullable = false,
+        precision = 12,
+        scale = 2,
+        updatable = false
+    )
     private BigDecimal totalAmount;
 
-    @Column(nullable = false)
+    @Column(
+        nullable = false,
+        length = 500
+    )
     private String shippingAddress;
 
     @CreatedDate

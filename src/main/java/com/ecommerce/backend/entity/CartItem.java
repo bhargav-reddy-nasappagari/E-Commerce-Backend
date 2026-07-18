@@ -6,10 +6,13 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -31,6 +34,10 @@ import lombok.ToString;
                         name = "uk_cart_product",
                         columnNames = {"cart_id", "product_id"}
                 )
+        },
+        indexes = {
+                @Index(name = "idx_cart_items_cart_id", columnList = "cart_id"),
+                @Index(name = "idx_cart_items_product_id", columnList = "product_id")
         }
 )
 public class CartItem {
@@ -48,7 +55,9 @@ public class CartItem {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
+    @NotNull
+    @Min(value = 1, message = "Quantity must be at least 1")
     @Column(nullable = false)
-    private int quantity;
+    private Integer quantity;
 
 }

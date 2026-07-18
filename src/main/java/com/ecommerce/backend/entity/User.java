@@ -11,6 +11,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -39,15 +42,28 @@ public class User {
     @EqualsAndHashCode.Include
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    @NotBlank(message = "Full name is required")
+    @Size(max = 100, message = "Full name cannot exceed 100 characters")
+    @Column(nullable = false)
     private String fullName;
 
-    @Column(nullable = false, unique = true, length = 150)
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email address")
+    @Size(max = 255, message = "Email cannot exceed 255 characters")
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false, length = 255)
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, max = 255)
+    @Column(nullable = false)
     private String password;
 
+    /**
+     * Intentionally EAGER because authorities are required
+     * during authentication and authorization.
+     * Roles are a very small collection and are loaded
+     * with every authenticated user.
+     */
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",
