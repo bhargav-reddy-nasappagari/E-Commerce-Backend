@@ -50,10 +50,10 @@ public class OrderItem {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @NotNull
+    @NotNull(message = "Quantity is required")
     @Min(value = 1, message = "Quantity must be at least 1")
     @Column(nullable = false)
-    private int quantity;
+    private Integer quantity;
 
     @Column(
         nullable = false,

@@ -5,15 +5,20 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import io.jsonwebtoken.JwtException;
+
 import java.io.IOException;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -69,9 +74,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 }
             }
 
-        } catch (Exception ignored) {
-            // Invalid, malformed, or expired JWT.
-            // Leave the SecurityContext empty and continue the filter chain.
+        } catch (JwtException | IllegalArgumentException ex) {
+            log.debug("Invalid JWT: {}", ex);
+        }
+        catch (UsernameNotFoundException ex) {
+            log.debug("User referenced by JWT not found: {}", ex);
         }
 
         filterChain.doFilter(request, response);
