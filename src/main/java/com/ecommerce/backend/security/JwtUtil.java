@@ -26,6 +26,11 @@ public class JwtUtil {
 
     @PostConstruct
     private void init() {
+        if (jwtSecret == null || jwtSecret.isBlank()) {
+                throw new IllegalStateException(
+                        "JWT_SECRET environment variable is not configured."
+                );
+            }        
         this.signingKey = Keys.hmacShaKeyFor(
                 Decoders.BASE64.decode(jwtSecret)
         );
